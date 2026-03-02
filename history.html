@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediction History</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #222;
+      color: white;
+    }
+    img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prediction History</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Image</th>
+        <th>Tumor</th>
+        <th>Confidence</th>
+      </tr>
+    </thead>
+    <tbody id="recordsTable"></tbody>
+  </table>
+
+  <script>
+    async function loadRecords() {
+      try {
+        const res = await fetch("http://localhost:5000/records");
+        const data = await res.json();
+
+        const table = document.getElementById("recordsTable");
+        table.innerHTML = "";
+
+        data.forEach((rec) => {
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+            <td>${rec.id}</td>
+            <td>${rec.name}</td>
+            <td>${rec.age}</td>
+            <td><img src="http://localhost:5000/uploads/${rec.filename}" /></td>
+            <td>${rec.tumor_detected === 1 ? "Yes" : "No"}</td>
+            <td>${(rec.confidence * 100).toFixed(1)}%</td>
+          `;
+
+          table.appendChild(tr);
+        });
+      } catch (error) {
+        console.error("Failed to load records", error);
+      }
+    }
+
+    loadRecords();
+  </script>
+</body>
+</html>
